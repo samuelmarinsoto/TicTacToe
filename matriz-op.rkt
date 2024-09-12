@@ -1,5 +1,11 @@
 #lang racket
 
+(provide
+	matriz-ini
+	matriz-buscar
+	matriz-marcar
+)
+
 ; m columnas
 ; n filas
 
@@ -24,6 +30,14 @@
 		((zero? m) (car vector))
 		(else
 			(vector-buscar (- m 1) (cdr vector)))
+	)
+)
+
+(define (matriz-buscar m n matriz)
+	(cond
+		((zero? n) (vector-buscar m (car matriz)))
+		(else
+			(matriz-buscar m (- n 1) (cdr matriz)))
 	)
 )
 
