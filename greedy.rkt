@@ -24,11 +24,12 @@
 					   (new-m (+ m dm))
 					   (new-n (+ n dn)))
 					(and (in-bounds? new-m new-n)
-						(equal? (matriz-buscar new-m new-n matriz) 0))))
+					     (equal? (matriz-buscar new-m new-n matriz) 0))))
 				directions)))
 
 	(define (place-adjacent m n)
 		(let ((adjacent-free (find-adjacent-free m n)))
+			(printf "Adjacent free spaces for (~a, ~a): ~a\n" m n adjacent-free) ; Debugging output
 			(if (null? adjacent-free)
 				(begin
 					(printf "No adjacent free space found for element at (~a, ~a)\n" m n)
@@ -45,18 +46,26 @@
 		(cond
 			((>= m (length matriz)) #f)
 			((>= n (length (list-ref matriz 0))) (loop (+ m 1) 0))
-			((= (matriz-buscar m n matriz) marcador)
-				(let ((result (place-adjacent m n)))
-					(if result
-						result
-						(loop m (+ n 1)))))
-			(else (loop m (+ n 1))))))
+			(else
+				(let ((current-value (matriz-buscar m n matriz)))
+					(printf "Checking position (~a, ~a): ~a\n" m n current-value) ; Debugging output
+					(if (= current-value marcador)
+						(let ((result (place-adjacent m n)))
+							(if result
+								result
+								(loop m (+ n 1))))
+						(loop m (+ n 1))))))))
 
-                                    
 ;; Example usage:
 ;; Initialize a matrix (replace with actual initialization)
-(define matriz '((1 0 0 0) (1 2 1 0) (2 1 0 0) (0 0 0 0)))
+(define matriz '((0 0 0 0 0)
+                 (0 0 0 0 0)
+                 (0 0 1 0 0)
+                 (0 0 0 0 0)
+                 (0 0 0 0 0)
+                 (0 0 0 0 0)))
 
 ;; Place a new element 'x'
-(define updated-matriz (place-nuevo-elemento matriz 1))
-(displayln updated-matriz)
+(define result (place-nuevo-elemento matriz 1)) ; Replace `1` with your `marcador` value
+(displayln result)
+
