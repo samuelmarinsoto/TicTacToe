@@ -36,5 +36,3 @@
 			(cons (car matriz) (matriz-marcar a m (- n 1) (cdr matriz))))
 	)
 )
-		
-		
