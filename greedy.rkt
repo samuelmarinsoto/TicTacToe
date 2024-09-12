@@ -58,14 +58,14 @@
 
 ;; Example usage:
 ;; Initialize a matrix (replace with actual initialization)
-(define matriz '((0 0 0 0 0)
-                 (0 0 0 0 0)
-                 (0 0 1 0 0)
-                 (0 0 0 0 0)
-                 (0 0 0 0 0)
-                 (0 0 0 0 0)))
+;(define matriz '((0 0 0 0 0)
+;                 (0 0 0 0 0)
+;                 (0 0 1 0 0)
+;                 (0 0 0 0 0)
+;                 (0 0 0 0 0)
+;                 (0 0 0 0 0)))
 
 ;; Place a new element 'x'
-(define result (place-nuevo-elemento matriz 1)) ; Replace `1` with your `marcador` value
-(displayln result)
+;(define result (place-nuevo-elemento matriz 1)) ; Replace `1` with your `marcador` value
+;(displayln result)
 
