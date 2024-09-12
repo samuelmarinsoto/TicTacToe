@@ -1,0 +1,79 @@
+#lang racket
+(require racket/gui)
+
+;; Crear el estado inicial del tablero
+(define tablero (make-vector 3 (make-vector 3 'vacío)))
+
+;; Crear el vector de botones
+(define botones (make-vector 3 (make-vector 3 #f)))
+
+;; Función para actualizar el tablero
+(define (actualizar-tablero fila columna jugador)
+  (vector-set! (vector-ref tablero fila) columna jugador))
+
+;; Función para verificar si una celda está vacía
+(define (es-celda-vacia? fila columna)
+  (eq? (vector-ref (vector-ref tablero fila) columna) 'vacío))
+
+;; Obtener el botón en una posición específica
+(define (obtener-boton fila columna)
+  (vector-ref (vector-ref botones fila) columna))
+
+;; Función para que el bot haga su movimiento
+(define (movimiento-bot)
+  (define (buscar-celda-vacia i j)
+    (if (< i 3)
+        (if (< j 3)
+            (if (es-celda-vacia? i j)
+                (begin
+                  (actualizar-tablero i j 'O)
+                  (send (obtener-boton i j) set-label "O"))
+                (buscar-celda-vacia i (+ j 1)))
+            (buscar-celda-vacia (+ i 1) 0))
+        #f))  ; Else case added to terminate recursion
+  (buscar-celda-vacia 0 0))
+
+;; Verificar si hay un ganador (esto es un ejemplo básico)
+(define (verificar-ganador)
+  ;; Aquí irían las verificaciones de filas, columnas y diagonales (columnas y diagonales cambian dependiendo del tamaño)
+  #f)
+
+;; Manejar el clic del jugador
+(define (manejar-clic fila columna btn)
+  (when (es-celda-vacia? fila columna)
+    (actualizar-tablero fila columna 'X)
+    (send btn set-label "X")
+    (when (not (verificar-ganador))
+      (movimiento-bot))))
+
+;; Crear el tablero gráfico
+(define (crear-tablero)
+  (define ventana (new frame% [label "Tic-Tac-Toe"]))
+  (define panel (new horizontal-panel% [parent ventana]))
+
+  ;; Función auxiliar para crear los botones
+  (define (crear-botones i j fila-panel)
+    (if (< j 3)
+        (let ([btn (new button% 
+                        [parent fila-panel] 
+                        [label " "]
+                        [callback (lambda (btn evento) 
+                                    (manejar-clic i j btn))])])
+          ;; Guardar el botón en el vector
+          (vector-set! (vector-ref botones i) j btn)
+          ;; Recursivamente crear los siguientes botones
+          (crear-botones i (+ j 1) fila-panel))
+        #f))  ; Else case added to stop recursion when j >= 3
+
+  ;; Función auxiliar para crear filas de botones
+  (define (crear-filas i)
+    (if (< i 3)
+        (let ([fila-panel (new vertical-panel% [parent panel])])
+          (crear-botones i 0 fila-panel)
+          (crear-filas (+ i 1)))
+        #f))  ; Else case added to stop recursion when i >= 3
+  
+  (crear-filas 0)
+  (send ventana show #t))
+
+(crear-tablero)
