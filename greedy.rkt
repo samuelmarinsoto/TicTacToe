@@ -24,7 +24,7 @@
 					   (new-m (+ m dm))
 					   (new-n (+ n dn)))
 					(and (in-bounds? new-m new-n)
-						(equal? (matriz-buscar new-m new-n matriz) #f))))
+						(equal? (matriz-buscar new-m new-n matriz) 0))))
 				directions)))
 
 	(define (place-adjacent m n)
@@ -45,7 +45,7 @@
 		(cond
 			((>= m (length matriz)) #f)
 			((>= n (length (list-ref matriz 0))) (loop (+ m 1) 0))
-			((equal? (matriz-buscar m n matriz) marcador)
+			((= (matriz-buscar m n matriz) marcador)
 				(let ((result (place-adjacent m n)))
 					(if result
 						result
@@ -55,8 +55,8 @@
                                     
 ;; Example usage:
 ;; Initialize a matrix (replace with actual initialization)
-;(define matriz '((#f #f #f #f) (o x o #f) (o x #f #f) (#f #f #f #f)))
+(define matriz '((1 0 0 0) (1 2 1 0) (2 1 0 0) (0 0 0 0)))
 
 ;; Place a new element 'x'
-;(define updated-matriz (place-nuevo-elemento matriz 'o))
-;(displayln updated-matriz)
+(define updated-matriz (place-nuevo-elemento matriz 1))
+(displayln updated-matriz)
