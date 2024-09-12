@@ -9,8 +9,7 @@
   insert-symbol     ;; Inserta un token en el tablero
   check-gane        ;; Verifica si hay un ganador
   check-tie        ;; Verifica si hay empate
-  greedy           ;; (Futura implementación de estrategia para IA)
-  place-nuevo-elemento ;; (Posible implementación futura para agregar elementos)
+  place-nuevo-elemento ;; (greedy)
 )
 
 ;;; -------- Lógica del juego ---------
@@ -163,137 +162,6 @@
         (print-matriz (cdr matrix))))) ;; Recurre a las siguientes filas
 )
 
-
-;;; -------- Greedy Algorithm  ---------
-
-;; Esta función verifica si el jugador tiene 3 fichas aliadas 
-;; consecutivas en una fila horizontal hacia la izquierda, tomando 
-;; en cuenta la posición del tablero y los valores de los jugadores.
-(define (ver_izq tablero jugador enem i j cont_h cont_f punt)
-  (cond
-    ((= cont_f 3) 1000) ; 3 fichas aliadas consecutivas, 1000 puntos ya que es gane
-    ((or (< cont_h 0) (< cont_h (- j 3)))
-     (ver_der tablero jugador enem i j (+ j 1) cont_f punt)) ; Verifica si está fuera de rango, pasa a verificar lado opuesto.
-    ((= (list-ref (list-ref tablero i) cont_h) enem)
-     (ver_der tablero jugador enem i j (+ j 1) cont_f (- punt 5))) ; Si se topa con ficha enemiga, resta puntos y pasa al lado opuesto.
-    ((= (list-ref (list-ref tablero i) cont_h) 0)
-     (ver_izq tablero jugador enem i j (- cont_h 1) cont_f (+ punt 3))) ; Espacio vacío, suma puntos pero menos.
-    (else
-     (ver_izq tablero jugador enem i j (- cont_h 1) (+ cont_f 1) (+ punt 15))) ; Ficha aliada, suma más puntos.
-    ))
-
-;; Esta función continúa hacia la derecha, verificando si hay 3 fichas consecutivas.
-(define (ver_der tablero jugador enem i j cont_h cont_f punt)
-  (cond
-    ((= cont_f 3) 1000)
-    ((or (= cont_h (length (list-ref tablero i))) (> cont_h (+ j 3)))
-     punt)
-    ((= (list-ref (list-ref tablero i) cont_h) enem)
-     (- punt 5))
-    ((= (list-ref (list-ref tablero i) cont_h) 0)
-     (ver_der tablero jugador enem i j (+ cont_h 1) cont_f (+ punt 3)))
-    (else
-     (ver_der tablero jugador enem i j (+ cont_h 1) (+ cont_f 1) (+ punt 15)))))
-
-;; Verifica si el jugador tiene 3 fichas consecutivas en diagonal hacia arriba-izquierda.
-(define (ver_izqa tablero jugador enem i j cont_h cont_v cont_f punt)
-  (cond
-    ((= cont_f 3) 1000)
-    ((or (< cont_h 0) (< cont_v 0) (< cont_h (- j 3)) (< cont_v (- i 3)))
-     (ver_derb tablero jugador enem i j (+ j 1) (+ i 1) cont_f punt))
-    ((= (list-ref (list-ref tablero cont_v) cont_h) enem)
-     (ver_derb tablero jugador enem i j (+ j 1) (+ i 1) cont_f (- punt 5)))
-    ((= (list-ref (list-ref tablero cont_v) cont_h) 0)
-     (ver_izqa tablero jugador enem i j (- cont_h 1) (- cont_v 1) cont_f (+ punt 3)))
-    (else
-     (ver_izqa tablero jugador enem i j (- cont_h 1) (- cont_v 1) (+ cont_f 1) (+ punt 15)))))
-
-;; Continúa hacia la derecha en diagonal verificando fichas consecutivas.
-(define (ver_derb tablero jugador enem i j cont_h cont_v cont_f punt)
-  (cond
-    ((= cont_f 3) 1000)
-    ((or (= cont_h (length (list-ref tablero i))) (> cont_h (+ j 3)) 
-         (= cont_v (length tablero)) (> cont_v (+ i 3)))
-     punt)
-    ((= (list-ref (list-ref tablero cont_v) cont_h) enem)
-     (- punt 5))
-    ((= (list-ref (list-ref tablero cont_v) cont_h) 0)
-     (ver_derb tablero jugador enem i j (+ cont_h 1) (+ cont_v 1) cont_f (+ punt 3)))
-    (else
-     (ver_derb tablero jugador enem i j (+ cont_h 1) (+ cont_v 1) (+ cont_f 1) (+ punt 15)))))
-
-;; Verifica si el jugador tiene 3 fichas consecutivas en diagonal hacia abajo-izquierda.
-(define (ver_izqb tablero jugador enem i j cont_h cont_v cont_f punt)
-  (cond
-    ((= cont_f 3) 1000)
-    ((or (< cont_h 0) (< cont_h (- j 3)) (= cont_v (length tablero)) (> cont_v (+ i 3)))
-     (ver_dera tablero jugador enem i j (+ j 1) (- i 1) cont_f punt))
-    ((= (list-ref (list-ref tablero cont_v) cont_h) enem)
-     (ver_dera tablero jugador enem i j (+ j 1) (- i 1) cont_f (- punt 5)))
-    ((= (list-ref (list-ref tablero cont_v) cont_h) 0)
-     (ver_izqb tablero jugador enem i j (- cont_h 1) (+ cont_v 1) cont_f (+ punt 3)))
-    (else
-     (ver_izqb tablero jugador enem i j (- cont_h 1) (+ cont_v 1) (+ cont_f 1) (+ punt 15)))))
-
-;; Continúa hacia la derecha en diagonal, verificando si hay 3 fichas consecutivas.
-(define (ver_dera tablero jugador enem i j cont_h cont_v cont_f punt)
-  (cond
-    ((= cont_f 3) 1000)
-    ((or (= cont_h (length (list-ref tablero i))) (> cont_h (+ j 3)) (< cont_v 0) (< cont_v (- i 3)))
-     punt)
-    ((= (list-ref (list-ref tablero cont_v) cont_h) enem)
-     (- punt 5))
-    ((= (list-ref (list-ref tablero cont_v) cont_h) 0)
-     (ver_dera tablero jugador enem i j (+ cont_h 1) (- cont_v 1) cont_f (+ punt 3)))
-    (else
-     (ver_dera tablero jugador enem i j (+ cont_h 1) (- cont_v 1) (+ cont_f 1) (+ punt 15)))))
-
-;; Verifica si el jugador tiene 3 fichas consecutivas en una columna hacia abajo.
-(define (ver_b tablero jugador enem i j cont_v cont_f punt)
-  (cond
-    ((= cont_f 3) 1000)
-    ((or (= cont_v (length tablero)) (> cont_v (+ j 3)))
-     punt)
-    ((= (list-ref (list-ref tablero cont_v) j) enem)
-     (- punt 5))
-    ((= (list-ref (list-ref tablero cont_v) j) 0)
-     (ver_b tablero jugador enem i j (+ cont_v 1) cont_f (+ punt 3)))
-    (else
-     (ver_b tablero jugador enem i j (+ cont_v 1) (+ cont_f 1) (+ punt 15)))))
-
-;; Función auxiliar para obtener el valor de una posición del tablero.
-(define (mget board i j)
-  (list-ref (list-ref board i) j))
-
-;;; -------- El Voraz  ---------
-
-;; Representa la estrategia Greedy, que selecciona la mejor jugada inmediata.
-(define (greedy board player enemy)
-  (solution
-   (selection
-    (objective board player enemy
-               (viabilidad board)))))
-
-;;; -------- Viabilidad  ---------
-
-;; Verifica si las columnas del tablero tienen espacio disponible.
-(define (viabilidad board)
-  (fea_aux board (length board) (length (list-ref board 0)) 
-                (- (length board) 1) 0 '() ))
-
-;; Recorre cada columna del tablero verificando si hay espacio disponible.
-(define (fea_aux board i j cont_v cont_h res)
-  (cond
-    ((< cont_v 0) ;; Si termina de recorrer la columna, pasa a la siguiente.
-     (fea_aux board i j (- i 1) (+ cont_h 1) res))
-    ((= cont_h j) ;; Si se termina de revisar todas las columnas, devuelve el resultado.
-     res)
-    ((= (mget board cont_v cont_h) 0) ;; Si la celda está vacía, la añade al resultado.
-     (fea_aux board i j (- i 1) (+ cont_h 1) 
-                  (append res (list (list cont_v cont_h)))))
-    (else ;; Si la celda no está vacía, sigue buscando.
-     (fea_aux board i j (- cont_v 1) cont_h res))))
-
 ;; Obtiene un valor específico de una lista según índices dados.
 (define (getij lst index num)
   (cond
@@ -301,130 +169,6 @@
      (car (list-ref lst index)))
     (else
      (cadr (list-ref lst index)))))
-
-;;; -------- Calculadora de Puntaje  ---------
-
-;; Calcula el puntaje de una jugada considerando la posición del jugador y el enemigo.
-(define (calculator board player enemy fea_res index)
-  (ver_izq board player enemy (getij fea_res index 1) (getij fea_res index 2) 
-  (- (getij fea_res index 2) 1) 0
-           (ver_izqa board player enemy (getij fea_res index 1) 
-           (getij fea_res index 2) (- (getij fea_res index 2) 1) 
-           (- (getij fea_res index 1) 1) 0
-                     (ver_izqb board player enemy 
-                     (getij fea_res index 1) (getij fea_res index 2) 
-                     (- (getij fea_res index 2) 1) 
-                     (+ (getij fea_res index 1) 1) 0
-                               (ver_b board player enemy 
-                               (getij fea_res index 1) 
-                               (getij fea_res index 2) 
-                               (+ (getij fea_res index 1) 1) 0 0)))))
-
-;;; -------- Conjunto de Candidatos  ---------
-
-;; Obtiene los movimientos posibles en una columna específica.
-(define (candidatos board player enemy fea_res index)
-  (candidatos_aux board player enemy (- (getij fea_res index 1) 1) 
-  (getij fea_res index 2)))
-
-;; Busca jugadas posibles en una columna en diferentes direcciones.
-(define (candidatos_aux board player enemy i j)
-  (cond
-    ((< i 0) 0)
-    (else
-     (ver_izq board player enemy i j (- j 1) 0
-           (ver_izqa board player enemy i j (- j 1) (- i 1) 0
-                     (ver_izqb board player enemy i j (- j 1) (+ i 1) 0
-               (ver_b board player enemy i j (+ i 1) 0 0)))))
-   )
-)
-
-;;; -------- Objetivo  ---------
-
-;; Calcula el objetivo, es decir, el puntaje posible de todas las jugadas factibles.
-(define (objective board player enemy fea_res)
-  (obj_aux board player enemy fea_res 0 '()))
-
-;; Calcula y suma el puntaje en cada columna del tablero.
-(define (obj_aux board player enemy fea_res index res)
-  (cond
-    ((= (length res) (length fea_res))
-     res)
-    (else
-     (obj_aux board player enemy fea_res (+ index 1)
-              (append res (list (list (getij fea_res index 1) 
-                          (getij fea_res index 2)
-                          (balance
-                           (calculator board player enemy fea_res index)
-                           (calculator board enemy player fea_res index)
-                           (candidatos board enemy player fea_res index)))))))))
-
-;; Ajusta los puntajes de cada jugada según la posición del jugador y enemigo.
-(define (balance playerscore enemyscore futurescore)
-  (cond ((> playerscore 900) 1000)
-        ((> enemyscore 900) 500)
-        ((> futurescore 900) -500)
-        (else playerscore)))
-
-;;; -------- Seleccion  ---------
-
-;; Esta función implementa el algoritmo de ordenamiento Selection 
-;; Sort para ordenar una lista de puntos en orden descendente, 
-;; de manera que la primera posición de la lista tenga el puntaje 
-;; más alto.
-(define (selection lst)
-  ;; Función auxiliar para obtener el puntaje (tercer elemento) de 
-  ;; una lista de listas.
-  (define (car-get-points lst2)
-    (caddar lst2)  ;; caddar toma el tercer elemento de una lista
-  )
-  
-  ;; Función auxiliar recursiva que selecciona el elemento con el 
-  ;; puntaje máximo de la lista dada.
-  (define (selection_aux lst2 max-lst)
-    (cond 
-      ((null? lst2)  ;; Si la lista está vacía, devuelve la lista con el máximo.
-       max-lst)
-      ;; Si el puntaje actual es mayor que el máximo actual, actualiza max-lst.
-      ((> (car-get-points lst2) (car-get-points max-lst))
-       (selection_aux (cdr lst2) (list (car lst2))))
-      ;; Si el puntaje es igual, añade el elemento a max-lst.
-      ((= (car-get-points lst2) (car-get-points max-lst))
-       (selection_aux (cdr lst2) (append max-lst (list (car lst2)))))
-      ;; De lo contrario, continúa revisando el resto de la lista.
-      (else
-       (selection_aux (cdr lst2) max-lst))
-    )
-  )
-  
-  ;; Selección de la lista base si no está vacía.
-  (cond
-    ((null? lst)
-     '())  ;; Si la lista está vacía, devuelve una lista vacía.
-    (else
-     (selection_aux (cdr lst) (list (car lst))))  ;; Llama a la función auxiliar.
-  )
-)
-
-;; Esta función toma una lista de listas y devuelve el segundo elemento de 
-;; la primera lista si solo hay una lista. De lo contrario, selecciona un 
-;; elemento de la lista usando "solution_aux".
-(define (solution lst)
-  (cond
-    ((= (length lst) 1)  ;; Si solo hay un elemento en la lista, devuelve el segundo.
-     (cadr (car lst)))
-    (else
-     (solution_aux lst)  ;; Si hay más de uno, llama a "solution_aux".
-     )
-  )
-)
-
-;; Esta función selecciona aleatoriamente un elemento de una lista
-;; y devuelve su segundo valor.
-(define (solution_aux lst)
-  (define random-index (random (length lst)))  ;; Genera un índice aleatorio.
-  (cadr (list-ref lst random-index))  ;; Devuelve el segundo elemento en el índice aleatorio.
-)
 
 ;; Función que busca un valor en una matriz dadas las coordenadas m y n.
 (define (matriz-buscar m n matriz)
@@ -438,6 +182,7 @@
 
 ;; Función para colocar un nuevo elemento en la matriz basado en 
 ;; la secuencia más larga encontrada.
+;; El greedy
 (define (place-nuevo-elemento matriz marcador)
   ;; Verifica si las coordenadas (m, n) están dentro de los límites de la matriz.
   (define (in-bounds? m n)
