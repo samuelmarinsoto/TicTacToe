@@ -1,5 +1,8 @@
 #lang racket
 
+; m columnas
+; n filas
+
 (define (vector-ini m miembro)
 	(cond
 		((zero? m) '())
