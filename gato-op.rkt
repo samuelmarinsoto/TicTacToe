@@ -3,43 +3,43 @@
 (require "matriz-op.rkt")
 
 (define (diagonal? matriz marcador m n)
-	(cond
-		(or
-			(and
-				(equal? marcador (matriz-buscar m n))
-				(equal? marcador (matriz-buscar (+ m 1) (+ n 1)))
-				(equal? marcador (matriz-buscar (- m 1) (- n 1)))
-			)
-			(and
-				(equal? marcador (matriz-buscar m n))
-				(equal? marcador (matriz-buscar (- m 1) (+ n 1)))
-				(equal? marcador (matriz-buscar (+ m 1) (- n 1)))
-			)
+	(or
+		(and ; soroeste-noreste
+			(equal? marcador (matriz-buscar m n matriz))
+			(equal? marcador (matriz-buscar (+ m 1) (+ n 1) matriz))
+			(equal? marcador (matriz-buscar (- m 1) (- n 1) matriz))
+		)
+		(and ; noroeste-sureste
+			(equal? marcador (matriz-buscar m n matriz))
+			(equal? marcador (matriz-buscar (- m 1) (+ n 1) matriz))
+			(equal? marcador (matriz-buscar (+ m 1) (- n 1) matriz))
 		)
 	)
 )
-			
-	
 
 (define (gane? matriz marcador m n)
 	(cond
-		((>= m (length (car matriz)))
+		((> m (length (car matriz)))
 			(error "Indice afuera de vector"))
-		((>= n (length matriz))
+		((> n (length matriz))
 			(error "Indice afuera de vector de vectores"))
-		(define (gane-aux? j i)
-			((zero? i) #f)
-			(else
+		(else
+			(define (gane-diag? j i)
 				(cond
-					((zero? j)
-						(gane-aux? m (- i 1)))
+					((zero? i) #f)
 					(else
-						(diagonal? matriz marcador j i))
+						(cond
+							((zero? j)
+								(gane-diag? m (- i 1)))
+							(else
+								(diagonal? matriz marcador j i))
+						)
+					)
 				)
 			)
+
+			(gane-diag? (- m 2) (- n 2))
 		)
-		
-		(gane-aux? (- m 1) (- n 1))
 	)
 )
 	

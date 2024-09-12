@@ -906,8 +906,6 @@
 )
 
 
-
-
 (define (matriz-buscar m n matriz)
   (if (and (>= m 0) (< m (length matriz)))
       ((lambda (row)
@@ -968,6 +966,3 @@
 
   ;; Start the loop from the initial position (0, 0)
   (loop 0 0))
-                                    
-
-
