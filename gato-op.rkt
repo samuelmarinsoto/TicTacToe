@@ -24,9 +24,24 @@
 	)
 )
 
-(define (diag-ne? matriz marcador n)
-	(cond
-		(
+(define (diag-ne? matriz marcador m n)
+	(define (diag-ne-aux? j i)
+		(cond
+			((= i n) #t)
+			((< j 0) #t)
+			(else
+				(cond
+					((not (equal? marcador (matriz-buscar j i)))
+						#f)
+					(else
+						(diag-ne-aux (- j 1) (+ i 1)))
+				)
+			)
+		)
+	)
+
+	(diag-ne-aux? (- m 1) 0)
+)
 
 (define (diagonal? matriz marcador m n)
 	(cond
