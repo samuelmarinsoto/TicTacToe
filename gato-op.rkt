@@ -4,12 +4,12 @@
 
 (define (diagonal? matriz marcador m n)
 	(or
-		(and
+		(and ; soroeste-noreste
 			(equal? marcador (matriz-buscar m n matriz))
 			(equal? marcador (matriz-buscar (+ m 1) (+ n 1) matriz))
 			(equal? marcador (matriz-buscar (- m 1) (- n 1) matriz))
 		)
-		(and
+		(and ; noroeste-sureste
 			(equal? marcador (matriz-buscar m n matriz))
 			(equal? marcador (matriz-buscar (- m 1) (+ n 1) matriz))
 			(equal? marcador (matriz-buscar (+ m 1) (- n 1) matriz))
@@ -24,13 +24,13 @@
 		((> n (length matriz))
 			(error "Indice afuera de vector de vectores"))
 		(else
-			(define (gane-aux? j i)
+			(define (gane-diag? j i)
 				(cond
 					((zero? i) #f)
 					(else
 						(cond
 							((zero? j)
-								(gane-aux? m (- i 1)))
+								(gane-diag? m (- i 1)))
 							(else
 								(diagonal? matriz marcador j i))
 						)
@@ -38,7 +38,7 @@
 				)
 			)
 
-			(gane-aux? (- m 2) (- n 2))
+			(gane-diag? (- m 2) (- n 2))
 		)
 	)
 )
