@@ -80,7 +80,7 @@
   (check-consecutive-aux 0 lst) ;; Inicializa el contador en 0
 )
 
-;; Verifica si hay un ganador (una secuencia de 4 elementos iguales)
+;; Verifica si hay un ganador (una secuencia de 3 elementos iguales)
 (define (check-gane board player)
   (define (check-row row)
     (check-consecutive (get-fila row board) player)) ;; Verifica filas
