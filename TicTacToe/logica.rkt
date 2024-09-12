@@ -9,6 +9,7 @@
          check-win
          check-tie
          greedy
+         place-nuevo-elemento
 )
 
 ;;; -------- Logica del juego ---------
@@ -903,3 +904,70 @@
   (define random-index (random (length lst)))
   (cadr (list-ref lst random-index ))
 )
+
+
+
+
+(define (matriz-buscar m n matriz)
+  (if (and (>= m 0) (< m (length matriz)))
+      ((lambda (row)
+         (if (and (>= n 0) (< n (length row)))
+             (list-ref row n)
+             (error "Column index out of bounds")))
+       (list-ref matriz m))
+      (error "Row index out of bounds")))
+
+;; Function to place the new element based on the longest sequence found
+(define (place-nuevo-elemento matriz marcador)
+  (define (in-bounds? m n)
+    (and (>= m 0) (< m (length matriz))
+         ((lambda (matrix-cols) (and (>= n 0) (< n matrix-cols)))
+          (length (list-ref matriz 0)))))
+
+  (define (find-adjacent-free m n)
+    ((lambda (directions)
+       (filter (lambda (dir)
+                 ((lambda (dm dn new-m new-n)
+                    (and (in-bounds? new-m new-n)
+                         (equal? (matriz-buscar new-m new-n matriz) 0)))
+                  (first dir) (second dir) (+ m (first dir)) (+ n (second dir))))
+               directions))
+     '((0 1) (1 0) (0 -1) (-1 0) (1 1) (-1 -1) (1 -1) (-1 1))))
+
+  (define (place-adjacent m n)
+    ((lambda (adjacent-free)
+       (printf "Adjacent free spaces for (~a, ~a): ~a\n" m n adjacent-free) ; Debugging output
+       (if (null? adjacent-free)
+           (begin
+             (printf "No adjacent free space found for element at (~a, ~a)\n" m n)
+             #f)
+           ((lambda (dir dm dn new-m new-n)
+              (printf "Placing new element at (~a, ~a)\n" new-m new-n)
+              (cons new-m new-n))
+            (first adjacent-free) (first (first adjacent-free))
+            (second (first adjacent-free))
+            (+ m (first (first adjacent-free)))
+            (+ n (second (first adjacent-free))))))
+     (find-adjacent-free m n)))
+
+  ;; Defining the loop function with a named lambda to support recursion
+  (define loop
+    (lambda (m n)
+      (cond
+        ((>= m (length matriz)) #f)
+        ((>= n (length (list-ref matriz 0))) (loop (+ m 1) 0))
+        (else
+         ((lambda (current-value)
+            (printf "Checking position (~a, ~a): ~a\n" m n current-value) ; Debugging output
+            (if (= current-value marcador)
+                ((lambda (result)
+                   (if result result (loop m (+ n 1))))
+                 (place-adjacent m n))
+                (loop m (+ n 1))))
+          (matriz-buscar m n matriz))))))
+
+  ;; Start the loop from the initial position (0, 0)
+  (loop 0 0))
+                                    
+
+
