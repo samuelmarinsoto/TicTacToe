@@ -3,6 +3,7 @@
 (require racket/gui/base)
 (require "logica.rkt")
 
+
 ;; -------- Interfaz del Juego ---------
 
 
@@ -207,13 +208,13 @@
    (when (not (check-game-status))
   ;; Juega Greddy
   (change-player actual-player)
-  (define play-greddy
-      (greedy board actual-player 1))
-  (set! board (insert-token play-greddy board actual-player))
+  (define voraz(place-nuevo-elemento board 1))
+  (set! board (insert-token (car voraz) (cdr voraz) board actual-player))
   
-  (displayln (format "La Computadora usa ficha ~a puso en columna ~a" 
+  (displayln (format "La Computadora usa ficha ~a puso en la fila ~a y columna ~a" 
                                       actual-player
-                                      play-greddy))
+                                     (car (place-nuevo-elemento board 1))
+                                     (cdr (place-nuevo-elemento board 1))))
   (print-matrix board)
   (update-board-panel)
   (check-game-status)
