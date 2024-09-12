@@ -19,6 +19,14 @@
 	)
 )
 
+(define (vector-buscar m vector)
+	(cond
+		((zero? m) (car vector))
+		(else
+			(vector-buscar (- m 1) (cdr vector)))
+	)
+)
+
 (define (vector-marcar a m vector)
 	(cond
 		((>= m (length vector)) (error "Indice afuera de vector"))
